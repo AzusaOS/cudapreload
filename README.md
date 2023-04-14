@@ -17,3 +17,8 @@ The following libs are taken into account:
 * `libnvidia-ptxjitcompiler.so.1`
 * `libnvoptix.so.1`
 * `vdpau/libvdpau_nvidia.so.1` ?
+
+## Usage
+
+	LD_PRELOAD=./cudapreload.so python -m torch.utils.collect_env
+
