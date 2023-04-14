@@ -14,7 +14,7 @@ $(TARGET): $(SOURCE)
 	gcc -shared -fPIC -std=gnu17 -Wall -pipe -o $@ $< -ldl
 
 install: $(TARGET)
-	install -D $(TARGET) "${DESTDIR}${PREFIX}/${LIBDIR}"
+	install -D -t "${DESTDIR}${PREFIX}/${LIBDIR}" $(TARGET)
 
 clean:
 	$(RM) $(TARGET)

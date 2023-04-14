@@ -20,5 +20,5 @@ The following libs are taken into account:
 
 ## Usage
 
-	LD_PRELOAD=./cudapreload.so python -m torch.utils.collect_env
+	LD_PRELOAD=/tmp/cudapreload.so CUDAPRELOAD_DEBUG=1 TORCH_NVFUSER_LIBRARY_PATH=/.../site-packages/torch/lib/ python3 -c 'import torch; print(torch.cuda.is_available())'
 
