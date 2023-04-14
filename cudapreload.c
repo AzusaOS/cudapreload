@@ -35,7 +35,6 @@ static void* (*real_dlopen)(const char *filename, int flag) = NULL;
 void *dlopen_cuda(const char *filename, int flag) {
 	char tmpbuf[PATH_MAX];
 
-	printf("Overloaded dlopen called with library: %s\n", filename);
 	// attempt to open filename in one of our available candidate paths
 	for(int i = 0; i < sizeof(cuda_candidate_paths)/sizeof(char*); i++) {
 		const char *cur = cuda_candidate_paths[i];
@@ -53,7 +52,9 @@ void *dlopen_cuda(const char *filename, int flag) {
 		// ok we got our full path, let's attempt to dlopen it
 		void *res = real_dlopen(tmpbuf, flag);
 		if (res != NULL) {
-			printf("opened %s for lib %s\n", tmpbuf, filename);
+			if (getenv("CUDAPRELOAD_DEBUG") != NULL) {
+				printf("opened %s for lib %s\n", tmpbuf, filename);
+			}
 			return res;
 		}
 	}
