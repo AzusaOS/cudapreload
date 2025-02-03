@@ -5,34 +5,47 @@
 #include <string.h>
 #include <limits.h>
 #include "lists.h"
+#include "nvidia.h"
 
 static void* (*real_dlopen)(const char *filename, int flag) = NULL;
 
-void *dlopen_cuda(const char *filename, int flag) {
+void *dlopen_nvidia_driver(const char *filename, int flag) {
+	const char *vers = get_nvidia_version();
+	if (vers == NULL) {
+		// no driver loaded
+		return NULL;
+	}
 	char tmpbuf[PATH_MAX];
 
-	// attempt to open filename in one of our available candidate paths
-	for(int i = 0; i < sizeof(cuda_candidate_paths)/sizeof(char*); i++) {
-		const char *cur = cuda_candidate_paths[i];
-		tmpbuf[0] = 0;
-		if (cur[0] != '/') {
-			// relative path
-			char *cuda_home = getenv("CUDA_HOME");
-			if (cuda_home == NULL) cuda_home = "/opt/cuda"; // default path
-			strncpy(tmpbuf, cuda_home, PATH_MAX-1);
-			strncat(tmpbuf, "/", PATH_MAX-1);
-		}
-		strncat(tmpbuf, cur, PATH_MAX-1); // always ends with a /
-		strncat(tmpbuf, filename, PATH_MAX-1);
+	strncpy(tmpbuf, "/pkg/main/x11-drivers.nvidia-drivers.libs.", PATH_MAX-1);
+	strncat(tmpbuf, vers, PATH_MAX-1);
+	strncat(tmpbuf, "/lib/", PATH_MAX-1);
+	strncat(tmpbuf, filename, PATH_MAX-1);
 
-		// ok we got our full path, let's attempt to dlopen it
-		void *res = real_dlopen(tmpbuf, flag);
-		if (res != NULL) {
-			if (getenv("CUDAPRELOAD_DEBUG") != NULL) {
-				printf("opened %s for lib %s\n", tmpbuf, filename);
-			}
-			return res;
+	// ok we got our full path, let's attempt to dlopen it
+	void *res = real_dlopen(tmpbuf, flag);
+	if (res != NULL) {
+		if (getenv("CUDAPRELOAD_DEBUG") != NULL) {
+			printf("opened %s for lib %s\n", tmpbuf, filename);
 		}
+		return res;
+	}
+	return NULL;
+}
+
+void *dlopen_cudnn(const char *filename, int flag) {
+	char tmpbuf[PATH_MAX];
+
+	strncpy(tmpbuf, "/pkg/main/dev-libs.cudnn.libs/lib/", PATH_MAX-1);
+	strncat(tmpbuf, filename, PATH_MAX-1);
+
+	// ok we got our full path, let's attempt to dlopen it
+	void *res = real_dlopen(tmpbuf, flag);
+	if (res != NULL) {
+		if (getenv("CUDAPRELOAD_DEBUG") != NULL) {
+			printf("opened %s for lib %s\n", tmpbuf, filename);
+		}
+		return res;
 	}
 	return NULL;
 }
@@ -46,11 +59,22 @@ void* dlopen(const char *filename, int flag) {
 		return real_dlopen(filename, flag);
 	}
 
-	// check if filename matches any of our cuda_libs
-	for(int i = 0; i < sizeof(cuda_libs)/sizeof(char*); i++) {
-		if (strcmp(cuda_libs[i], filename) == 0) {
+	// check if filename matches any cuda_libs
+	for(int i = 0; i < sizeof(nvidia_driver_libs)/sizeof(char*); i++) {
+		if (strncmp(nvidia_driver_libs[i], filename, strlen(nvidia_driver_libs[i])) == 0) {
 			// it's a match
-			void *res = dlopen_cuda(filename, flag);
+			void *res = dlopen_nvidia_driver(filename, flag);
+			if (res != NULL) {
+				return res;
+			}
+			break;
+		}
+	}
+	// check for cudnn
+	for(int i = 0; i < sizeof(cudnn_libs_pfx)/sizeof(char*); i++) {
+		if (strncmp(cudnn_libs_pfx[i], filename, strlen(cudnn_libs_pfx[i])) == 0) {
+			// it's a match
+			void *res = dlopen_nvidia_driver(filename, flag);
 			if (res != NULL) {
 				return res;
 			}
@@ -58,6 +82,5 @@ void* dlopen(const char *filename, int flag) {
 		}
 	}
 
-	// Modify the library loading behavior here, if needed
 	return real_dlopen(filename, flag);
 }
