@@ -1,22 +1,9 @@
 # cudapreload
 
-Sometimes libcuda is installed in a non-standard path. This project overrides dlopen() to direct attempts to load cuda libraries to the right path using a more complete search than normal dlopen()
+This library will allow most tools (torch, etc) needing access to nvidia drivers to work fine. This will analyze the currently loaded nvidia kernel driver and direct dlopen() calls to the right libraries, meaning that even if you upgraded recently but still have an old kernel driver loaded it will still work fine.
 
-The following libs are taken into account:
+Additionally, cudnn libs will also be loaded from cudnn.
 
-* `libcuda.so.1`
-* `libnvcuvid.so.1`
-* `libnvidia-allocator.so.1`
-* `libnvidia-cfg.so.1`
-* `libnvidia-encode.so.1`
-* `libnvidia-fbc.so.1`
-* `libnvidia-ml.so.1`
-* `libnvidia-ngx.so.1`
-* `libnvidia-opencl.so.1`
-* `libnvidia-opticalflow.so.1`
-* `libnvidia-ptxjitcompiler.so.1`
-* `libnvoptix.so.1`
-* `vdpau/libvdpau_nvidia.so.1` ?
 
 ## Usage
 

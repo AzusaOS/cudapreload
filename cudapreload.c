@@ -71,6 +71,7 @@ void* dlopen(const char *filename, int flag) {
 		}
 	}
 	// check for cudnn
+	// TODO if the file ends in .so.8 redirect to cudnn 8 instead of latest
 	for(int i = 0; i < sizeof(cudnn_libs_pfx)/sizeof(char*); i++) {
 		if (strncmp(cudnn_libs_pfx[i], filename, strlen(cudnn_libs_pfx[i])) == 0) {
 			// it's a match
