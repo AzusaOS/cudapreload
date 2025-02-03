@@ -27,6 +27,25 @@ static const char *cuda_libs[] = {
 	"libnvoptix.so",
 };
 
+static const char *cudnn_libs[] = {
+	"libcudnn_adv.so",
+	"libcudnn_adv.so.9",
+	"libcudnn_cnn.so",
+	"libcudnn_cnn.so.9",
+	"libcudnn_engines_precompiled.so",
+	"libcudnn_engines_precompiled.so.9",
+	"libcudnn_engines_runtime_compiled.so",
+	"libcudnn_engines_runtime_compiled.so.9",
+	"libcudnn_graph.so",
+	"libcudnn_graph.so.9",
+	"libcudnn_heuristic.so",
+	"libcudnn_heuristic.so.9",
+	"libcudnn_ops.so",
+	"libcudnn_ops.so.9",
+	"libcudnn.so",
+	"libcudnn.so.9",
+};
+
 static const char *cuda_candidate_paths[] = {
 #ifdef __x86_64__
 	"/usr/lib64/",
