@@ -10,6 +10,7 @@
 #include "nvidia.h"
 
 #define NVIDIA_SYSFS_PATH "/sys/module/nvidia/version"
+#define SMALL_FILESIZE_MAXIMUM_LENGTH 128
 
 // read a small file in a newly allocated null terminated buffer
 static int read_small_file(const char *path, char **outBuf) {
@@ -21,29 +22,19 @@ static int read_small_file(const char *path, char **outBuf) {
 		return -1;
 	}
 
-	struct stat st;
-	if (fstat(fd, &st) < 0) {
-		close(fd);
-		return -1;
-	}
-
-	// We only care about reasonably small files (<=128 bytes).
-	if (st.st_size <= 0 || st.st_size > 128) {
-		close(fd);
-		return -1;
-	}
-
 	// Allocate enough space for the file content plus a null terminator.
-	char *buf = malloc(st.st_size + 1);
+	char *buf = malloc(SMALL_FILESIZE_MAXIMUM_LENGTH+1);
+
 	if (!buf) {
 		close(fd);
 		return -1;
 	}
 
-	ssize_t bytesRead = read(fd, buf, st.st_size);
+	ssize_t bytesRead = read(fd, buf, SMALL_FILESIZE_MAXIMUM_LENGTH);
 	close(fd);
 
-	if (bytesRead < 0) {
+	if ((bytesRead < 0) || (bytesRead >= SMALL_FILESIZE_MAXIMUM_LENGTH)) {
+		// too small or too large
 		free(buf);
 		return -1;
 	}

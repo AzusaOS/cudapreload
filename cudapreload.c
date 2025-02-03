@@ -12,6 +12,7 @@ static void* (*real_dlopen)(const char *filename, int flag) = NULL;
 void *dlopen_nvidia_driver(const char *filename, int flag) {
 	const char *vers = get_nvidia_version();
 	if (vers == NULL) {
+		fprintf(stderr, "no nvidia :(\n");
 		// no driver loaded
 		return NULL;
 	}
@@ -26,7 +27,7 @@ void *dlopen_nvidia_driver(const char *filename, int flag) {
 	void *res = real_dlopen(tmpbuf, flag);
 	if (res != NULL) {
 		if (getenv("CUDAPRELOAD_DEBUG") != NULL) {
-			printf("opened %s for lib %s\n", tmpbuf, filename);
+			fprintf(stderr, "opened %s for lib %s\n", tmpbuf, filename);
 		}
 		return res;
 	}
