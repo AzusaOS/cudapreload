@@ -35,16 +35,3 @@ static const char *nvidia_driver_libs[] = {
 	"libOpenGL.so",
 	"libvdpau_nvidia.so",
 };
-
-// prefix for libs found in
-// /pkg/main/dev-libs.cudnn.libs/lib
-static const char *cudnn_libs_pfx[] = {
-	"libcudnn_adv.so",
-	"libcudnn_cnn.so",
-	"libcudnn_engines_precompiled.so",
-	"libcudnn_engines_runtime_compiled.so",
-	"libcudnn_graph.so",
-	"libcudnn_heuristic.so",
-	"libcudnn_ops.so",
-	"libcudnn.so",
-};
