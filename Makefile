@@ -4,10 +4,10 @@ OBJECTS=cudapreload.o nvidia.o
 TARGET=cudapreload.so
 
 # for make install
-PREFIX?=/usr/local
-LIBDIR?=lib
-DESTDIR?=
-CC?=gcc
+PREFIX=/usr/local
+LIBDIR=lib
+DESTDIR=
+CC=gcc
 CFLAGS=-Wall -pipe -fPIC
 
 all: $(TARGET)
